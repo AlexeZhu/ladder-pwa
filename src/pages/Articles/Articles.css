@@ -1,0 +1,29 @@
+/* 头部按钮组 */
+.header-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.read-full-btn, .stop-read-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.read-full-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.read-full-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.stop-read-btn {
+  background: #ff9800;
+  color: white;
+}
