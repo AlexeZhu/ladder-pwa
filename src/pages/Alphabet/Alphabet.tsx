@@ -1,15 +1,37 @@
 // src/pages/Alphabet/Alphabet.tsx
+import { useState, useEffect } from 'react';
 import { useProgressStore } from '../../stores/progressStore';
-import { alphabetData } from '../../data/alphabetData';
+import { useLanguageStore } from '../../stores/languageStore';
+import { loadLanguageData } from '../../data/languageLoader';
+import type { AlphabetItem } from '../../data/locales/en-US/alphabet';
 import './Alphabet.css';
 
 function Alphabet() {
+  const { l2 } = useLanguageStore();
   const { alphabetMastery, markAlphabetComplete } = useProgressStore();
+  const [alphabetData, setAlphabetData] = useState<AlphabetItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const data = await loadLanguageData(l2);
+      setAlphabetData(data.alphabetData || []);
+      setLoading(false);
+    };
+    loadData();
+  }, [l2]);
 
   const speak = (char: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(char);
-    utterance.lang = 'en-US';
+    // 根据语言设置正确的语音
+    const langMap: Record<string, string> = {
+      'en-US': 'en-US',
+      'ja-JP': 'ja-JP',
+      'ko-KR': 'ko-KR',
+    };
+    utterance.lang = langMap[l2] || 'en-US';
     utterance.rate = 0.7;
     window.speechSynthesis.speak(utterance);
   };
@@ -20,11 +42,31 @@ function Alphabet() {
 
   const completedCount = Object.keys(alphabetMastery).length;
   const totalCount = alphabetData.length;
-  const progress = (completedCount / totalCount) * 100;
+  const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+  if (loading) {
+    return (
+      <div className="alphabet-page">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (alphabetData.length === 0) {
+    return (
+      <div className="alphabet-page">
+        <div className="empty-state">
+          <p>暂无字母数据</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="alphabet-page">
-      {/* 进度条 */}
       <div className="progress-section">
         <div className="progress-info">
           <span>学习进度</span>
@@ -35,7 +77,6 @@ function Alphabet() {
         </div>
       </div>
 
-      {/* 字母网格 */}
       <div className="alphabet-grid">
         {alphabetData.map((item) => {
           const isCompleted = alphabetMastery[item.id];

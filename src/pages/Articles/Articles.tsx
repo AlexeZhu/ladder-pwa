@@ -1,20 +1,59 @@
 // src/pages/Articles/Articles.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useProgressStore } from '../../stores/progressStore';
-import { articleData } from '../../data/articleData';
-import type { ArticleItem } from '../../data/articleData';
+import { useLanguageStore } from '../../stores/languageStore';
+import { loadLanguageData } from '../../data/languageLoader';
+import type { ArticleItem } from '../../data/locales/en-US/articles';
 import './Articles.css';
 
 type Level = 'beginner' | 'intermediate' | 'advanced';
 
 function Articles() {
+  const { l2 } = useLanguageStore();
   const { readArticles, readArticle } = useProgressStore();
+  const [articleData, setArticleData] = useState<ArticleItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [level, setLevel] = useState<Level>('beginner');
   const [selectedArticle, setSelectedArticle] = useState<ArticleItem | null>(null);
   const [showTranslation, setShowTranslation] = useState(false);
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [wordMeaning, setWordMeaning] = useState<string | null>(null);
   const [isReadingFull, setIsReadingFull] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+  const loadData = async () => {
+    setLoading(true);
+    const data = await loadLanguageData(l2);
+    console.log('Loaded article data for', l2, data);  // 👈 添加这行
+    console.log('articleData:', data.articleData);     // 👈 添加这行
+    setArticleData(data.articleData || []);
+    setLoading(false);
+  };
+  loadData();
+}, [l2]);
+
+  // 监听滚动进度
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!selectedArticle) return;
+      const element = document.querySelector('.article-content');
+      if (element) {
+        const scrollTop = element.scrollTop;
+        const scrollHeight = element.scrollHeight - element.clientHeight;
+        const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        setScrollProgress(progress);
+      }
+    };
+    
+    if (selectedArticle) {
+      const element = document.querySelector('.article-content');
+      element?.addEventListener('scroll', handleScroll);
+      // 初始检查一次
+      handleScroll();
+      return () => element?.removeEventListener('scroll', handleScroll);
+    }
+  }, [selectedArticle]);
 
   const currentArticles = articleData.filter(a => a.level === level);
   
@@ -27,7 +66,12 @@ function Articles() {
   const speak = (text: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
+    const langMap: Record<string, string> = {
+      'en-US': 'en-US',
+      'ja-JP': 'ja-JP',
+      'ko-KR': 'ko-KR',
+    };
+    utterance.lang = langMap[l2] || 'en-US';
     utterance.rate = 0.8;
     window.speechSynthesis.speak(utterance);
   };
@@ -47,7 +91,12 @@ function Articles() {
         return;
       }
       const utterance = new SpeechSynthesisUtterance(sentences[currentIndex]);
-      utterance.lang = 'en-US';
+      const langMap: Record<string, string> = {
+        'en-US': 'en-US',
+        'ja-JP': 'ja-JP',
+        'ko-KR': 'ko-KR',
+      };
+      utterance.lang = langMap[l2] || 'en-US';
       utterance.rate = 0.8;
       utterance.onend = () => {
         setTimeout(() => {
@@ -64,7 +113,6 @@ function Articles() {
     speakNext();
   };
 
-  // 停止朗读
   const stopReading = () => {
     window.speechSynthesis.cancel();
     setIsReadingFull(false);
@@ -77,6 +125,7 @@ function Articles() {
     setShowTranslation(false);
     setSelectedWord(null);
     setWordMeaning(null);
+    setScrollProgress(0);
     if (!isRead(article.id)) {
       readArticle(article.id);
     }
@@ -89,10 +138,15 @@ function Articles() {
       'benefits': '好处', 'habit': '习惯', 'knowledge': '知识', 'vocabulary': '词汇',
       'stress': '压力', 'relax': '放松', 'focus': '专注', 'concentration': '注意力',
       'technology': '科技', 'transformed': '改变', 'communicate': '交流',
-      'accessible': '可获取的', 'privacy': '隐私', 'security': '安全'
+      'accessible': '可获取的', 'privacy': '隐私', 'security': '安全',
+      // 日语单词
+      'ohayou': '早上好', 'konnichiwa': '你好', 'arigatou': '谢谢', 'sumimasen': '对不起',
+      'sushi': '寿司', 'ramen': '拉面', 'tempura': '天妇罗', 'taberu': '吃',
+      // 韩语单词
+      'annyeonghaseyo': '你好', 'kamsahamnida': '谢谢', 'kimchi': '泡菜', 'bulgogi': '烤肉'
     };
     setSelectedWord(word);
-    setWordMeaning(simpleDict[word.toLowerCase()] || '查无此词');
+    setWordMeaning(simpleDict[word.toLowerCase()] || '点击查词');
     setTimeout(() => {
       setSelectedWord(null);
       setWordMeaning(null);
@@ -103,8 +157,20 @@ function Articles() {
     speak(sentence);
   };
 
+  if (loading) {
+    return (
+      <div className="articles-page">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="articles-page">
+      {/* 难度标签 */}
       <div className="level-tabs">
         {(['beginner', 'intermediate', 'advanced'] as Level[]).map(l => (
           <button
@@ -117,6 +183,7 @@ function Articles() {
         ))}
       </div>
 
+      {/* 文章列表 */}
       <div className="articles-list">
         {currentArticles.map(article => (
           <div key={article.id} className={`article-card ${isRead(article.id) ? 'read' : ''}`}>
@@ -136,12 +203,19 @@ function Articles() {
         ))}
       </div>
 
+      {/* 阅读弹窗 */}
       {selectedArticle && (
         <div className="modal-overlay" onClick={() => {
           stopReading();
           setSelectedArticle(null);
         }}>
           <div className="modal-content article-reader" onClick={(e) => e.stopPropagation()}>
+            {/* 阅读进度条 */}
+            <div 
+              className="reading-progress" 
+              style={{ transform: `scaleX(${scrollProgress / 100})` }}
+            ></div>
+            
             <div className="modal-header">
               <div>
                 <h3>{selectedArticle.title}</h3>
@@ -210,6 +284,7 @@ function Articles() {
               ))}
             </div>
 
+            {/* 单词提示浮层 */}
             {selectedWord && wordMeaning && (
               <div className="word-tooltip">
                 <span className="word">{selectedWord}</span>

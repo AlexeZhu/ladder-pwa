@@ -12,7 +12,6 @@ import { useLanguageStore } from './stores/languageStore';
 function App() {
   const { hasOnboarded } = useLanguageStore();
 
-  // 如果未完成首次引导，显示引导页
   if (!hasOnboarded) {
     return <Onboarding />;
   }
@@ -33,4 +32,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;  // 👈 确保这一行存在

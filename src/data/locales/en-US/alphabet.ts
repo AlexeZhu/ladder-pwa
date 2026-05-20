@@ -1,4 +1,4 @@
-// src/data/alphabetData.ts
+// src/data/locales/en-US/alphabet.ts
 export interface AlphabetItem {
   id: string;
   char: string;
@@ -7,7 +7,6 @@ export interface AlphabetItem {
   audioUrl: string;
   exampleWord: string;
   exampleTranslation: string;
-  exampleImage?: string;
 }
 
 export const alphabetData: AlphabetItem[] = [

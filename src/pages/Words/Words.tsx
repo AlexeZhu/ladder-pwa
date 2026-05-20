@@ -1,28 +1,44 @@
 // src/pages/Words/Words.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useProgressStore } from '../../stores/progressStore';
-import { wordData, wordGroups } from '../../data/wordData';
-import type { WordItem } from '../../data/wordData';
+import { useLanguageStore } from '../../stores/languageStore';
+import { loadLanguageData } from '../../data/languageLoader';
+import type { WordItem } from '../../data/locales/en-US/words';
 import './Words.css';
 
 function Words() {
+  const { l2 } = useLanguageStore();
   const { wordsMastery, updateWordMastery } = useProgressStore();
-  const [selectedGroup, setSelectedGroup] = useState<string>('animals');
+  const [wordData, setWordData] = useState<WordItem[]>([]);
+  const [wordGroups, setWordGroups] = useState<{ id: string; name: string; icon: string; color: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedGroup, setSelectedGroup] = useState<string>('');
   const [selectedWord, setSelectedWord] = useState<WordItem | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
 
-  // 获取当前分组的单词
-  const currentWords = wordData.filter(w => w.group === selectedGroup);
-  
-  // 获取当前分组的学习进度
-  const groupWords = currentWords;
-  const masteredCount = groupWords.filter(w => (wordsMastery[w.id] || 0) >= 3).length;
-  const progress = (masteredCount / groupWords.length) * 100;
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const data = await loadLanguageData(l2);
+      setWordData(data.wordData || []);
+      setWordGroups(data.wordGroups || []);
+      if (data.wordGroups && data.wordGroups.length > 0) {
+        setSelectedGroup(data.wordGroups[0].id);
+      }
+      setLoading(false);
+    };
+    loadData();
+  }, [l2]);
 
   const speak = (word: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = 'en-US';
+    const langMap: Record<string, string> = {
+      'en-US': 'en-US',
+      'ja-JP': 'ja-JP',
+      'ko-KR': 'ko-KR',
+    };
+    utterance.lang = langMap[l2] || 'en-US';
     utterance.rate = 0.7;
     window.speechSynthesis.speak(utterance);
   };
@@ -34,6 +50,10 @@ function Words() {
     if (level >= 3) return '掌握';
     return '未学习';
   };
+
+  const currentWords = wordData.filter(w => w.group === selectedGroup);
+  const masteredCount = currentWords.filter(w => (wordsMastery[w.id] || 0) >= 3).length;
+  const progress = currentWords.length > 0 ? (masteredCount / currentWords.length) * 100 : 0;
 
   const handleStudy = (word: WordItem) => {
     setSelectedWord(word);
@@ -62,9 +82,19 @@ function Words() {
     setShowQuiz(false);
   };
 
+  if (loading) {
+    return (
+      <div className="words-page">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>加载中...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="words-page">
-      {/* 分组标签 */}
       <div className="group-tabs">
         {wordGroups.map(group => (
           <button
@@ -79,18 +109,16 @@ function Words() {
         ))}
       </div>
 
-      {/* 进度条 */}
       <div className="words-progress">
         <div className="progress-info">
           <span>📊 学习进度</span>
-          <span>{masteredCount} / {groupWords.length} 已掌握</span>
+          <span>{masteredCount} / {currentWords.length} 已掌握</span>
         </div>
         <div className="progress-bar">
           <div className="progress-fill" style={{ width: `${progress}%`, backgroundColor: wordGroups.find(g => g.id === selectedGroup)?.color }}></div>
         </div>
       </div>
 
-      {/* 单词列表 */}
       <div className="words-list">
         {currentWords.map(word => {
           const level = wordsMastery[word.id] || 0;
@@ -121,7 +149,7 @@ function Words() {
         })}
       </div>
 
-      {/* 学习/测验弹窗 */}
+      {/* 学习弹窗 */}
       {selectedWord && !showQuiz && (
         <div className="modal-overlay" onClick={() => setSelectedWord(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

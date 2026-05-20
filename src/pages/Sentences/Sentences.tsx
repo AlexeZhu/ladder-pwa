@@ -1,18 +1,44 @@
 // src/pages/Sentences/Sentences.tsx
-// src/pages/Sentences/Sentences.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useProgressStore } from '../../stores/progressStore';
-import { sentenceData } from '../../data/sentenceData';
-import type { SentenceItem } from '../../data/sentenceData';
+import { useLanguageStore } from '../../stores/languageStore';
+import { loadLanguageData } from '../../data/languageLoader';
+import type { SentenceItem } from '../../data/locales/en-US/sentences';
 import './Sentences.css';
 
 type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
 function Sentences() {
+  const { l2 } = useLanguageStore();
   const { completedSentences, completeSentence } = useProgressStore();
+  const [sentenceData, setSentenceData] = useState<SentenceItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [difficulty, setDifficulty] = useState<Difficulty>('beginner');
   const [selectedSentence, setSelectedSentence] = useState<SentenceItem | null>(null);
   const [showFillBlank, setShowFillBlank] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const data = await loadLanguageData(l2);
+      setSentenceData(data.sentenceData || []);
+      setLoading(false);
+    };
+    loadData();
+  }, [l2]);
+
+  const speak = (text: string) => {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    const langMap: Record<string, string> = {
+      'en-US': 'en-US',
+      'ja-JP': 'ja-JP',
+      'ko-KR': 'ko-KR',
+    };
+    utterance.lang = langMap[l2] || 'en-US';
+    utterance.rate = 0.7;
+    window.speechSynthesis.speak(utterance);
+  };
 
   const currentSentences = sentenceData.filter(s => s.difficulty === difficulty);
   
@@ -22,13 +48,7 @@ function Sentences() {
     advanced: '🌲 高级'
   };
 
-  const speak = (text: string) => {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.7;
-    window.speechSynthesis.speak(utterance);
-  };
+  const isCompleted = (id: string) => completedSentences.includes(id);
 
   const handleLearn = (sentence: SentenceItem) => {
     setSelectedSentence(sentence);
@@ -48,12 +68,19 @@ function Sentences() {
     setShowFillBlank(false);
   };
 
-  // 检查句子是否完成
-  const isCompleted = (id: string) => completedSentences.includes(id);
+  if (loading) {
+    return (
+      <div className="sentences-page">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>加载中...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="sentences-page">
-      {/* 难度筛选 */}
       <div className="difficulty-tabs">
         {(['beginner', 'intermediate', 'advanced'] as Difficulty[]).map(level => (
           <button
@@ -66,7 +93,6 @@ function Sentences() {
         ))}
       </div>
 
-      {/* 句子列表 */}
       <div className="sentences-list">
         {currentSentences.map(sentence => (
           <div key={sentence.id} className={`sentence-card ${isCompleted(sentence.id) ? 'completed' : ''}`}>
@@ -133,7 +159,6 @@ function Sentences() {
               <p className="fillblank-question">请填写空白处的单词：</p>
               <div className="fillblank-sentence">
                 {(() => {
-                  // 随机选择一个关键词来填空
                   const keywords = selectedSentence.keywords;
                   if (keywords.length === 0) return selectedSentence.text;
                   const targetKeyword = keywords[Math.floor(Math.random() * keywords.length)];

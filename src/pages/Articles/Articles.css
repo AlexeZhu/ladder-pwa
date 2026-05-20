@@ -1,29 +1,378 @@
-/* 头部按钮组 */
+/* src/pages/Articles/Articles.css */
+.articles-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  padding-bottom: 80px;
+}
+
+/* 难度标签 - 现代化设计 */
+.level-tabs {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.level-tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  background: #f0f2f5;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.level-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 文章卡片 - 卡片式设计 */
+.articles-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.article-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.article-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.article-card.read {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-color: #4caf50;
+}
+
+.article-info {
+  flex: 1;
+}
+
+.article-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.article-desc {
+  font-size: 12px;
+  color: #888;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.article-actions {
+  margin-left: 16px;
+}
+
+.read-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.read-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.read-badge {
+  font-size: 12px;
+  color: #4caf50;
+  font-weight: bold;
+  margin-left: 10px;
+  display: inline-block;
+}
+
+/* 阅读弹窗 - 书籍风格 */
+.article-reader {
+  width: 95%;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 24px;
+  background: #fefefe;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-radius: 24px 24px 0 0;
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  margin: 0 0 5px 0;
+}
+
+.article-level {
+  font-size: 12px;
+  opacity: 0.9;
+  margin: 5px 0 0 0;
+}
+
 .header-buttons {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
-.read-full-btn, .stop-read-btn {
-  padding: 6px 12px;
+.read-full-btn, .stop-read-btn, .trans-toggle {
+  padding: 6px 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 12px;
-}
-
-.read-full-btn {
-  background: #4caf50;
+  font-weight: 500;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.2);
   color: white;
 }
 
-.read-full-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+.read-full-btn:hover, .stop-read-btn:hover, .trans-toggle:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.02);
 }
 
-.stop-read-btn {
-  background: #ff9800;
+.close-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
   color: white;
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: rotate(90deg);
+}
+
+/* 文章内容 - 书本内页风格 */
+.article-content {
+  padding: 32px 28px;
+  background: #fffaf5;
+  line-height: 1.8;
+}
+
+.paragraph {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed #e0d6cc;
+}
+
+.paragraph:last-child {
+  border-bottom: none;
+}
+
+.english-text {
+  font-size: 17px;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.7;
+  position: relative;
+  padding-right: 40px;
+}
+
+.speak-sentence-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  padding: 4px;
+}
+
+.speak-sentence-btn:hover {
+  opacity: 1;
+}
+
+.chinese-text {
+  font-size: 14px;
+  color: #8b6b4d;
+  padding: 12px 16px;
+  background: #f5efe8;
+  border-radius: 12px;
+  margin-top: 12px;
+  border-left: 4px solid #d4a574;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* 可点击单词 */
+.clickable-word {
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+  padding: 0 1px;
+  border-radius: 4px;
+}
+
+.clickable-word:hover {
+  background: linear-gradient(135deg, #FFE082, #FFD54F);
+  transform: scale(1.02);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* 单词提示浮层 - 优雅设计 */
+.word-tooltip {
+  position: fixed;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #2c3e50, #1a252f);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 14px;
+  z-index: 1000;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.word-tooltip .word {
+  font-weight: bold;
+  font-size: 16px;
+  color: #FFD54F;
+}
+
+.word-tooltip .meaning {
+  font-size: 14px;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 阅读进度指示器（可选） */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  z-index: 100;
+  transform-origin: 0%;
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+  .article-content {
+    padding: 20px 16px;
+  }
+  
+  .english-text {
+    font-size: 15px;
+  }
+  
+  .modal-header h3 {
+    font-size: 16px;
+  }
+  
+  .header-buttons {
+    gap: 4px;
+  }
+  
+  .read-full-btn, .stop-read-btn, .trans-toggle {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+  
+  .read-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+  
+  .article-title {
+    font-size: 15px;
+  }
+
+}
+/* 阅读进度条 */
+.reading-progress {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  transform-origin: 0%;
+  transition: transform 0.1s ease-out;
+  z-index: 20;
+  border-radius: 3px;
+}
+
+/* 确保阅读弹窗内容可以滚动 */
+.article-content {
+  overflow-y: auto;
+  max-height: calc(85vh - 100px);
+}
+
+/* 模态框内容滚动时进度条固定 */
+.article-reader {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }

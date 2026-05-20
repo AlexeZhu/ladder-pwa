@@ -7,18 +7,15 @@ const LANGUAGES = [
   { code: 'en-US', name: 'English' },
   { code: 'ja-JP', name: '日本語' },
   { code: 'ko-KR', name: '한국어' },
-  { code: 'es-ES', name: 'Español' },
-  { code: 'fr-FR', name: 'Français' },
 ];
 
 function Onboarding() {
   const [selectedL1, setSelectedL1] = useState('zh-CN');
   const [selectedL2, setSelectedL2] = useState('en-US');
-  const { completeOnboarding } = useLanguageStore();  // 👈 改用 completeOnboarding
+  const { completeOnboarding } = useLanguageStore();
 
   const handleStart = () => {
     completeOnboarding(selectedL1, selectedL2);
-    // 不需要 reload，React 会自动重新渲染
   };
 
   return (
@@ -100,4 +97,4 @@ function Onboarding() {
   );
 }
 
-export default Onboarding;
+export default Onboarding;  // 👈 确保这一行存在
