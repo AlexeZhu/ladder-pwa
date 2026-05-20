@@ -1,0 +1,127 @@
+/* src/pages/Alphabet/Alphabet.css */
+.alphabet-page {
+  padding: 16px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.progress-section {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4A90E2, #667eea);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.alphabet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.alphabet-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.alphabet-card.completed {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border: 1px solid #4caf50;
+}
+
+.alphabet-char {
+  font-size: 48px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.alphabet-sound {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  font-family: monospace;
+}
+
+.alphabet-example {
+  font-size: 14px;
+  color: #4A90E2;
+  margin-bottom: 12px;
+}
+
+.example-translation {
+  font-size: 12px;
+  color: #999;
+  margin-left: 4px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.play-btn, .complete-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.play-btn {
+  background-color: #4A90E2;
+  color: white;
+}
+
+.play-btn:hover {
+  background-color: #357abd;
+}
+
+.play-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.complete-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.complete-btn:hover {
+  background-color: #45a049;
+}
+
+.completed-badge {
+  font-size: 12px;
+  color: #4caf50;
+  font-weight: bold;
+}
