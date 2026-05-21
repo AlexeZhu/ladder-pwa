@@ -1,15 +1,20 @@
 // src/pages/Profile/Profile.tsx
+import { useState } from 'react';
 import { useLanguageStore } from '../../stores/languageStore';
 import { useProgressStore } from '../../stores/progressStore';
-import { useUserStore } from '../../stores/userStore';
 import { TARGET_LANGUAGES, NATIVE_LANGUAGES } from '../../data/languageLoader';
 import './Profile.css';
-import { useState } from 'react';
+
+// 定义语言类型
+interface Language {
+  code: string;
+  name: string;
+  flag: string;
+}
 
 function Profile() {
   const { l1, l2, completeOnboarding } = useLanguageStore();
-  const { isAlphabetComplete, getAlphabetProgress } = useProgressStore();
-  const { user, isLoggedIn, logout } = useUserStore();
+  const { getAlphabetProgress } = useProgressStore();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [tempL1, setTempL1] = useState(l1);
   const [tempL2, setTempL2] = useState(l2);
@@ -18,36 +23,30 @@ function Profile() {
   const alphabetProgress = getAlphabetProgress();
   
   // 获取语言名称
-  const getLanguageName = (code: string) => {
-    const allLanguages = [...NATIVE_LANGUAGES, ...TARGET_LANGUAGES];
-    const lang = allLanguages.find(l => l.code === code);
+  const getLanguageName = (code: string): string => {
+    const allLanguages: Language[] = [...NATIVE_LANGUAGES, ...TARGET_LANGUAGES];
+    const lang = allLanguages.find((l: Language) => l.code === code);
     return lang ? `${lang.flag} ${lang.name}` : code;
   };
 
   const handleLanguageChange = () => {
     completeOnboarding(tempL1, tempL2);
     setShowLanguageModal(false);
-    // 刷新页面以重新加载数据
     window.location.reload();
   };
 
   // 获取可选的学习语言（排除母语）
-  const availableTargetLanguages = TARGET_LANGUAGES.filter(lang => lang.code !== tempL1);
+  const availableTargetLanguages = TARGET_LANGUAGES.filter((lang: Language) => lang.code !== tempL1);
 
   return (
     <div className="profile-page">
       {/* 用户信息卡片 */}
       <div className="profile-card">
-        <div className="avatar">
-          {isLoggedIn ? user?.nickname?.[0] || 'U' : '👤'}
-        </div>
+        <div className="avatar">👤</div>
         <div className="user-info">
-          <h3>{isLoggedIn ? user?.nickname || '用户' : '游客用户'}</h3>
-          <p>{isLoggedIn ? user?.email : '登录后可同步学习进度'}</p>
+          <h3>游客用户</h3>
+          <p>登录后可同步学习进度</p>
         </div>
-        {!isLoggedIn && (
-          <button className="login-btn">登录/注册</button>
-        )}
       </div>
 
       {/* 当前语言设置 */}
@@ -131,14 +130,13 @@ function Profile() {
                   onChange={(e) => {
                     const newL1 = e.target.value;
                     setTempL1(newL1);
-                    // 如果母语变成当前学习的语言，自动调整学习语言
                     if (tempL2 === newL1) {
-                      const otherLang = availableTargetLanguages.find(l => l.code !== newL1);
+                      const otherLang = availableTargetLanguages.find((l: Language) => l.code !== newL1);
                       if (otherLang) setTempL2(otherLang.code);
                     }
                   }}
                 >
-                  {NATIVE_LANGUAGES.map(lang => (
+                  {NATIVE_LANGUAGES.map((lang: Language) => (
                     <option key={lang.code} value={lang.code}>
                       {lang.flag} {lang.name}
                     </option>
@@ -151,7 +149,7 @@ function Profile() {
                   value={tempL2} 
                   onChange={(e) => setTempL2(e.target.value)}
                 >
-                  {availableTargetLanguages.map(lang => (
+                  {availableTargetLanguages.map((lang: Language) => (
                     <option key={lang.code} value={lang.code}>
                       {lang.flag} {lang.name}
                     </option>

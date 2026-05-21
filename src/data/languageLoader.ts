@@ -7,9 +7,6 @@ export const NATIVE_LANGUAGES = [
   { code: 'en-US', name: 'English', flag: '🇺🇸' },
   { code: 'ja-JP', name: '日本語', flag: '🇯🇵' },
   { code: 'ko-KR', name: '한국어', flag: '🇰🇷' },
-  { code: 'es-ES', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr-FR', name: 'Français', flag: '🇫🇷' },
-  { code: 'de-DE', name: 'Deutsch', flag: '🇩🇪' },
 ];
 
 // 所有可学习的目标语言（有学习内容）
@@ -17,9 +14,6 @@ export const TARGET_LANGUAGES = [
   { code: 'en-US', name: 'English', flag: '🇺🇸' },
   { code: 'ja-JP', name: '日本語', flag: '🇯🇵' },
   { code: 'ko-KR', name: '한국어', flag: '🇰🇷' },
-  // 后续添加更多语言内容后，在这里添加
-  // { code: 'es-ES', name: 'Español', flag: '🇪🇸' },
-  // { code: 'fr-FR', name: 'Français', flag: '🇫🇷' },
 ];
 
 // 语言数据缓存
@@ -41,4 +35,14 @@ export const loadLanguageData = async (languageCode: string) => {
     dataCache[languageCode] = fallbackData;
     return fallbackData;
   }
+};
+
+// Hook 用于在组件中获取语言数据
+export const useLanguageData = () => {
+  const { l2 } = useLanguageStore();
+  return {
+    languageCode: l2,
+    loadData: () => loadLanguageData(l2),
+    getSupportedLanguages: () => TARGET_LANGUAGES,
+  };
 };
