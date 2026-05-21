@@ -7,6 +7,7 @@ const LANGUAGES = [
   { code: 'en-US', name: 'English' },
   { code: 'ja-JP', name: '日本語' },
   { code: 'ko-KR', name: '한국어' },
+  { code: 'ru-RU', name: 'Русский' },  // 新增
 ];
 
 function Onboarding() {
