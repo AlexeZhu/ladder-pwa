@@ -5,7 +5,6 @@ import { useProgressStore } from '../../stores/progressStore';
 import { TARGET_LANGUAGES, NATIVE_LANGUAGES } from '../../data/languageLoader';
 import './Profile.css';
 
-// 定义语言类型
 interface Language {
   code: string;
   name: string;
@@ -19,10 +18,8 @@ function Profile() {
   const [tempL1, setTempL1] = useState(l1);
   const [tempL2, setTempL2] = useState(l2);
 
-  // 学习统计
   const alphabetProgress = getAlphabetProgress();
   
-  // 获取语言名称
   const getLanguageName = (code: string): string => {
     const allLanguages: Language[] = [...NATIVE_LANGUAGES, ...TARGET_LANGUAGES];
     const lang = allLanguages.find((l: Language) => l.code === code);
@@ -35,12 +32,10 @@ function Profile() {
     window.location.reload();
   };
 
-  // 获取可选的学习语言（排除母语）
   const availableTargetLanguages = TARGET_LANGUAGES.filter((lang: Language) => lang.code !== tempL1);
 
   return (
     <div className="profile-page">
-      {/* 用户信息卡片 */}
       <div className="profile-card">
         <div className="avatar">👤</div>
         <div className="user-info">
@@ -49,11 +44,8 @@ function Profile() {
         </div>
       </div>
 
-      {/* 当前语言设置 */}
       <div className="settings-section">
-        <div className="section-title">
-          <span>🌐 语言设置</span>
-        </div>
+        <div className="section-title">🌐 语言设置</div>
         <div className="setting-item clickable" onClick={() => setShowLanguageModal(true)}>
           <div className="setting-row">
             <span className="setting-label">📖 我的母语</span>
@@ -67,11 +59,8 @@ function Profile() {
         </div>
       </div>
 
-      {/* 学习统计 */}
       <div className="stats-section">
-        <div className="section-title">
-          <span>📊 学习统计</span>
-        </div>
+        <div className="section-title">📊 学习统计</div>
         <div className="stats-grid">
           <div className="stat-card">
             <div className="stat-value">{Math.round(alphabetProgress)}%</div>
@@ -92,11 +81,8 @@ function Profile() {
         </div>
       </div>
 
-      {/* 其他设置 */}
       <div className="settings-section">
-        <div className="section-title">
-          <span>⚙️ 其他设置</span>
-        </div>
+        <div className="section-title">⚙️ 其他设置</div>
         <div className="setting-item">
           <span>🔔 每日提醒</span>
           <label className="switch">
@@ -114,7 +100,6 @@ function Profile() {
         </div>
       </div>
 
-      {/* 语言切换弹窗 */}
       {showLanguageModal && (
         <div className="modal-overlay" onClick={() => setShowLanguageModal(false)}>
           <div className="modal-content language-modal" onClick={(e) => e.stopPropagation()}>
