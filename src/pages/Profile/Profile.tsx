@@ -1,15 +1,10 @@
 // src/pages/Profile/Profile.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguageStore } from '../../stores/languageStore';
 import { useProgressStore } from '../../stores/progressStore';
-import { TARGET_LANGUAGES, NATIVE_LANGUAGES } from '../../data/languageLoader';
+import { getNativeLanguages, getTargetLanguages } from '../../config/languageConfig';
+import type { Language } from '../../config/languageConfig';
 import './Profile.css';
-
-interface Language {
-  code: string;
-  name: string;
-  flag: string;
-}
 
 function Profile() {
   const { l1, l2, completeOnboarding } = useLanguageStore();
@@ -17,11 +12,25 @@ function Profile() {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [tempL1, setTempL1] = useState(l1);
   const [tempL2, setTempL2] = useState(l2);
+  const [nativeLanguages, setNativeLanguages] = useState<Language[]>([]);
+  const [targetLanguages, setTargetLanguages] = useState<Language[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadLanguages = async () => {
+      const native = await getNativeLanguages();
+      const target = await getTargetLanguages();
+      setNativeLanguages(native);
+      setTargetLanguages(target);
+      setLoading(false);
+    };
+    loadLanguages();
+  }, []);
 
   const alphabetProgress = getAlphabetProgress();
   
   const getLanguageName = (code: string): string => {
-    const allLanguages: Language[] = [...NATIVE_LANGUAGES, ...TARGET_LANGUAGES];
+    const allLanguages = [...nativeLanguages, ...targetLanguages];
     const lang = allLanguages.find((l: Language) => l.code === code);
     return lang ? `${lang.flag} ${lang.name}` : code;
   };
@@ -32,7 +41,11 @@ function Profile() {
     window.location.reload();
   };
 
-  const availableTargetLanguages = TARGET_LANGUAGES.filter((lang: Language) => lang.code !== tempL1);
+  const availableTargetLanguages = targetLanguages.filter((lang: Language) => lang.code !== tempL1);
+
+  if (loading) {
+    return <div className="profile-page"><div className="loading-container">加载中...</div></div>;
+  }
 
   return (
     <div className="profile-page">
@@ -121,7 +134,7 @@ function Profile() {
                     }
                   }}
                 >
-                  {NATIVE_LANGUAGES.map((lang: Language) => (
+                  {nativeLanguages.map((lang: Language) => (
                     <option key={lang.code} value={lang.code}>
                       {lang.flag} {lang.name}
                     </option>

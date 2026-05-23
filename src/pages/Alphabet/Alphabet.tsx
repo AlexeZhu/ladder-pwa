@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useProgressStore } from '../../stores/progressStore';
 import { useLanguageStore } from '../../stores/languageStore';
 import { loadLanguageData } from '../../data/languageLoader';
+import { loadLanguageConfig, getVoiceLangSync } from '../../config/languageConfig';
 import type { AlphabetItem } from '../../data/locales/en-US/alphabet';
 import './Alphabet.css';
 
@@ -11,10 +12,13 @@ function Alphabet() {
   const { alphabetMastery, markAlphabetComplete } = useProgressStore();
   const [alphabetData, setAlphabetData] = useState<AlphabetItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [voiceLang, setVoiceLang] = useState('en-US');
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      const config = await loadLanguageConfig();
+      setVoiceLang(getVoiceLangSync(l2, config));
       const data = await loadLanguageData(l2);
       setAlphabetData(data.alphabetData || []);
       setLoading(false);
@@ -25,18 +29,7 @@ function Alphabet() {
   const speak = (char: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(char);
-    // 根据语言设置正确的语音
-    const langMap: Record<string, string> = {
-  'en-US': 'en-US',
-  'ja-JP': 'ja-JP',
-  'ko-KR': 'ko-KR',
-  'ru-RU': 'ru-RU',
-  'es-ES': 'es-ES',    // 西班牙语
-  'fr-FR': 'fr-FR',    // 法语
-  'de-DE': 'de-DE',    // 德语
-};
-
-    utterance.lang = langMap[l2] || 'en-US';
+    utterance.lang = voiceLang;
     utterance.rate = 0.7;
     window.speechSynthesis.speak(utterance);
   };

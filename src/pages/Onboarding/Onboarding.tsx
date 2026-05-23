@@ -1,26 +1,48 @@
 // src/pages/Onboarding/Onboarding.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguageStore } from '../../stores/languageStore';
-
-const LANGUAGES = [
-  { code: 'zh-CN', name: '中文（简体）' },
-  { code: 'en-US', name: 'English' },
-  { code: 'ja-JP', name: '日本語' },
-  { code: 'ko-KR', name: '한국어' },
-  { code: 'ru-RU', name: 'Русский' },
-  { code: 'es-ES', name: 'Español' },
-  { code: 'fr-FR', name: 'Français' },
-  { code: 'de-DE', name: 'Deutsch' },
-];
+import { getNativeLanguages, getTargetLanguages } from '../../config/languageConfig';
+import type { Language } from '../../config/languageConfig';
 
 function Onboarding() {
   const [selectedL1, setSelectedL1] = useState('zh-CN');
   const [selectedL2, setSelectedL2] = useState('en-US');
+  const [nativeLanguages, setNativeLanguages] = useState<Language[]>([]);
+  const [targetLanguages, setTargetLanguages] = useState<Language[]>([]);
+  const [loading, setLoading] = useState(true);
   const { completeOnboarding } = useLanguageStore();
+
+  useEffect(() => {
+    const loadLanguages = async () => {
+      const native = await getNativeLanguages();
+      const target = await getTargetLanguages();
+      setNativeLanguages(native);
+      setTargetLanguages(target);
+      setLoading(false);
+    };
+    loadLanguages();
+  }, []);
 
   const handleStart = () => {
     completeOnboarding(selectedL1, selectedL2);
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        maxWidth: '500px', 
+        margin: '0 auto', 
+        padding: '40px 20px',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ color: 'white' }}>加载语言配置中...</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ 
@@ -53,8 +75,8 @@ function Onboarding() {
               fontSize: '16px'
             }}
           >
-            {LANGUAGES.map(lang => (
-              <option key={lang.code} value={lang.code}>{lang.name}</option>
+            {nativeLanguages.map(lang => (
+              <option key={lang.code} value={lang.code}>{lang.flag} {lang.name}</option>
             ))}
           </select>
         </div>
@@ -74,8 +96,8 @@ function Onboarding() {
               fontSize: '16px'
             }}
           >
-            {LANGUAGES.filter(lang => lang.code !== selectedL1).map(lang => (
-              <option key={lang.code} value={lang.code}>{lang.name}</option>
+            {targetLanguages.filter(lang => lang.code !== selectedL1).map(lang => (
+              <option key={lang.code} value={lang.code}>{lang.flag} {lang.name}</option>
             ))}
           </select>
         </div>
@@ -101,4 +123,4 @@ function Onboarding() {
   );
 }
 
-export default Onboarding;  // 👈 确保这一行存在
+export default Onboarding;

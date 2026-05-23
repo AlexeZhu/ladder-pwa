@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useProgressStore } from '../../stores/progressStore';
 import { useLanguageStore } from '../../stores/languageStore';
 import { loadLanguageData } from '../../data/languageLoader';
+import { loadLanguageConfig, getVoiceLangSync } from '../../config/languageConfig';
 import type { SentenceItem } from '../../data/locales/en-US/sentences';
 import './Sentences.css';
 
@@ -16,10 +17,13 @@ function Sentences() {
   const [difficulty, setDifficulty] = useState<Difficulty>('beginner');
   const [selectedSentence, setSelectedSentence] = useState<SentenceItem | null>(null);
   const [showFillBlank, setShowFillBlank] = useState(false);
+  const [voiceLang, setVoiceLang] = useState('en-US');
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      const config = await loadLanguageConfig();
+      setVoiceLang(getVoiceLangSync(l2, config));
       const data = await loadLanguageData(l2);
       setSentenceData(data.sentenceData || []);
       setLoading(false);
@@ -30,16 +34,7 @@ function Sentences() {
   const speak = (text: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    const langMap: Record<string, string> = {
-  'en-US': 'en-US',
-  'ja-JP': 'ja-JP',
-  'ko-KR': 'ko-KR',
-  'ru-RU': 'ru-RU',
-  'es-ES': 'es-ES',    // 西班牙语
-  'fr-FR': 'fr-FR',    // 法语
-  'de-DE': 'de-DE',    // 德语
-};
-    utterance.lang = langMap[l2] || 'en-US';
+    utterance.lang = voiceLang;
     utterance.rate = 0.7;
     window.speechSynthesis.speak(utterance);
   };

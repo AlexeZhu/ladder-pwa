@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useProgressStore } from '../../stores/progressStore';
 import { useLanguageStore } from '../../stores/languageStore';
 import { loadLanguageData } from '../../data/languageLoader';
+import { loadLanguageConfig, getVoiceLangSync } from '../../config/languageConfig';
 import type { ArticleItem } from '../../data/locales/en-US/articles';
 import './Articles.css';
 
@@ -20,18 +21,19 @@ function Articles() {
   const [wordMeaning, setWordMeaning] = useState<string | null>(null);
   const [isReadingFull, setIsReadingFull] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [voiceLang, setVoiceLang] = useState('en-US');
 
   useEffect(() => {
-  const loadData = async () => {
-    setLoading(true);
-    const data = await loadLanguageData(l2);
-    console.log('Loaded article data for', l2, data);  // 👈 添加这行
-    console.log('articleData:', data.articleData);     // 👈 添加这行
-    setArticleData(data.articleData || []);
-    setLoading(false);
-  };
-  loadData();
-}, [l2]);
+    const loadData = async () => {
+      setLoading(true);
+      const config = await loadLanguageConfig();
+      setVoiceLang(getVoiceLangSync(l2, config));
+      const data = await loadLanguageData(l2);
+      setArticleData(data.articleData || []);
+      setLoading(false);
+    };
+    loadData();
+  }, [l2]);
 
   // 监听滚动进度
   useEffect(() => {
@@ -49,7 +51,6 @@ function Articles() {
     if (selectedArticle) {
       const element = document.querySelector('.article-content');
       element?.addEventListener('scroll', handleScroll);
-      // 初始检查一次
       handleScroll();
       return () => element?.removeEventListener('scroll', handleScroll);
     }
@@ -66,16 +67,7 @@ function Articles() {
   const speak = (text: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    const langMap: Record<string, string> = {
-  'en-US': 'en-US',
-  'ja-JP': 'ja-JP',
-  'ko-KR': 'ko-KR',
-  'ru-RU': 'ru-RU',
-  'es-ES': 'es-ES',    // 西班牙语
-  'fr-FR': 'fr-FR',    // 法语
-  'de-DE': 'de-DE',    // 德语
-};
-    utterance.lang = langMap[l2] || 'en-US';
+    utterance.lang = voiceLang;
     utterance.rate = 0.8;
     window.speechSynthesis.speak(utterance);
   };
@@ -95,12 +87,7 @@ function Articles() {
         return;
       }
       const utterance = new SpeechSynthesisUtterance(sentences[currentIndex]);
-      const langMap: Record<string, string> = {
-        'en-US': 'en-US',
-        'ja-JP': 'ja-JP',
-        'ko-KR': 'ko-KR',
-      };
-      utterance.lang = langMap[l2] || 'en-US';
+      utterance.lang = voiceLang;
       utterance.rate = 0.8;
       utterance.onend = () => {
         setTimeout(() => {
@@ -143,11 +130,8 @@ function Articles() {
       'stress': '压力', 'relax': '放松', 'focus': '专注', 'concentration': '注意力',
       'technology': '科技', 'transformed': '改变', 'communicate': '交流',
       'accessible': '可获取的', 'privacy': '隐私', 'security': '安全',
-      // 日语单词
-      'ohayou': '早上好', 'konnichiwa': '你好', 'arigatou': '谢谢', 'sumimasen': '对不起',
-      'sushi': '寿司', 'ramen': '拉面', 'tempura': '天妇罗', 'taberu': '吃',
-      // 韩语单词
-      'annyeonghaseyo': '你好', 'kamsahamnida': '谢谢', 'kimchi': '泡菜', 'bulgogi': '烤肉'
+      'climate': '气候', 'change': '变化', 'environment': '环境', 'future': '未来',
+      'mental': '心理的', 'health': '健康', 'important': '重要的', 'people': '人们'
     };
     setSelectedWord(word);
     setWordMeaning(simpleDict[word.toLowerCase()] || '点击查词');
@@ -174,7 +158,6 @@ function Articles() {
 
   return (
     <div className="articles-page">
-      {/* 难度标签 */}
       <div className="level-tabs">
         {(['beginner', 'intermediate', 'advanced'] as Level[]).map(l => (
           <button
@@ -187,7 +170,6 @@ function Articles() {
         ))}
       </div>
 
-      {/* 文章列表 */}
       <div className="articles-list">
         {currentArticles.map(article => (
           <div key={article.id} className={`article-card ${isRead(article.id) ? 'read' : ''}`}>
@@ -207,14 +189,12 @@ function Articles() {
         ))}
       </div>
 
-      {/* 阅读弹窗 */}
       {selectedArticle && (
         <div className="modal-overlay" onClick={() => {
           stopReading();
           setSelectedArticle(null);
         }}>
           <div className="modal-content article-reader" onClick={(e) => e.stopPropagation()}>
-            {/* 阅读进度条 */}
             <div 
               className="reading-progress" 
               style={{ transform: `scaleX(${scrollProgress / 100})` }}
@@ -288,7 +268,6 @@ function Articles() {
               ))}
             </div>
 
-            {/* 单词提示浮层 */}
             {selectedWord && wordMeaning && (
               <div className="word-tooltip">
                 <span className="word">{selectedWord}</span>

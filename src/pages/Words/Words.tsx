@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useProgressStore } from '../../stores/progressStore';
 import { useLanguageStore } from '../../stores/languageStore';
 import { loadLanguageData } from '../../data/languageLoader';
+import { loadLanguageConfig, getVoiceLangSync } from '../../config/languageConfig';
 import type { WordItem } from '../../data/locales/en-US/words';
 import './Words.css';
 
@@ -15,10 +16,13 @@ function Words() {
   const [selectedGroup, setSelectedGroup] = useState<string>('');
   const [selectedWord, setSelectedWord] = useState<WordItem | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [voiceLang, setVoiceLang] = useState('en-US');
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      const config = await loadLanguageConfig();
+      setVoiceLang(getVoiceLangSync(l2, config));
       const data = await loadLanguageData(l2);
       setWordData(data.wordData || []);
       setWordGroups(data.wordGroups || []);
@@ -33,16 +37,7 @@ function Words() {
   const speak = (word: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(word);
-    const langMap: Record<string, string> = {
-  'en-US': 'en-US',
-  'ja-JP': 'ja-JP',
-  'ko-KR': 'ko-KR',
-  'ru-RU': 'ru-RU',
-  'es-ES': 'es-ES',    // 西班牙语
-  'fr-FR': 'fr-FR',    // 法语
-  'de-DE': 'de-DE',    // 德语
-};
-    utterance.lang = langMap[l2] || 'en-US';
+    utterance.lang = voiceLang;
     utterance.rate = 0.7;
     window.speechSynthesis.speak(utterance);
   };

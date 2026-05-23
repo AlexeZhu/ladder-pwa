@@ -1,0 +1,30 @@
+{
+  "nativeLanguages": [
+    { "code": "zh-CN", "name": "中文（简体）", "flag": "🇨🇳" },
+    { "code": "en-US", "name": "English", "flag": "🇺🇸" },
+    { "code": "ja-JP", "name": "日本語", "flag": "🇯🇵" },
+    { "code": "ko-KR", "name": "한국어", "flag": "🇰🇷" },
+    { "code": "ru-RU", "name": "Русский", "flag": "🇷🇺" },
+    { "code": "es-ES", "name": "Español", "flag": "🇪🇸" },
+    { "code": "fr-FR", "name": "Français", "flag": "🇫🇷" },
+    { "code": "de-DE", "name": "Deutsch", "flag": "🇩🇪" }
+  ],
+  "targetLanguages": [
+    { "code": "en-US", "name": "English", "flag": "🇺🇸" },
+    { "code": "ja-JP", "name": "日本語", "flag": "🇯🇵" },
+    { "code": "ko-KR", "name": "한국어", "flag": "🇰🇷" },
+    { "code": "ru-RU", "name": "Русский", "flag": "🇷🇺" },
+    { "code": "es-ES", "name": "Español", "flag": "🇪🇸" },
+    { "code": "fr-FR", "name": "Français", "flag": "🇫🇷" },
+    { "code": "de-DE", "name": "Deutsch", "flag": "🇩🇪" }
+  ],
+  "voiceMapping": {
+    "en-US": "en-US",
+    "ja-JP": "ja-JP",
+    "ko-KR": "ko-KR",
+    "ru-RU": "ru-RU",
+    "es-ES": "es-ES",
+    "fr-FR": "fr-FR",
+    "de-DE": "de-DE"
+  }
+}
