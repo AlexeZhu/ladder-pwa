@@ -34,10 +34,14 @@ function Words() {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(word);
     const langMap: Record<string, string> = {
-      'en-US': 'en-US',
-      'ja-JP': 'ja-JP',
-      'ko-KR': 'ko-KR',
-    };
+  'en-US': 'en-US',
+  'ja-JP': 'ja-JP',
+  'ko-KR': 'ko-KR',
+  'ru-RU': 'ru-RU',
+  'es-ES': 'es-ES',    // 西班牙语
+  'fr-FR': 'fr-FR',    // 法语
+  'de-DE': 'de-DE',    // 德语
+};
     utterance.lang = langMap[l2] || 'en-US';
     utterance.rate = 0.7;
     window.speechSynthesis.speak(utterance);
